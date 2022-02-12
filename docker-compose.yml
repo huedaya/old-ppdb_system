@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: app-ppdb
+    mem_limit: 100m
+    restart: always
+    volumes:
+      - ./:/app
+      - ~/.composer/auth.json:/root/.composer/auth.json
+      - composer_cache:/root/.composer/cache
+      - yarn_cache:/usr/local/share/.cache/yarn/v6
+    ports:
+      - 3080:80
+      - 3443:443
+    networks:
+      - local
+
+  db:
+    image: mariadb
+    container_name: db-ppdb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: app
+      MYSQL_USER: root
+      MYSQL_PASSWORD: toor
+      TZ: UTC
+    ports:
+      - 3306:3306
+    networks:
+      - local
+    volumes:
+      - db-data:/var/lib/mysql
+    command: mysqld --default-storage-engine=MyISAM
+
+networks:
+  local:
+
+volumes:
+  composer_cache:
+  yarn_cache:
+  db-data:
